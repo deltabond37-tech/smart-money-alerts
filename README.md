@@ -62,6 +62,22 @@ On first sight of a wallet the worker **baselines** its existing positions (no a
 2. Environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SLACK_BOT_TOKEN`, `SLACK_CHANNEL_*`, `TZ=Asia/Kolkata`, optional `DASHBOARD_ALLOWED_EMAILS`.
 3. Deploy, then add the Vercel URL to Supabase Auth redirect URLs (step 1.3).
 
+## Current deployment (provisioned 2026-10-15)
+
+| Piece | Where | State |
+|---|---|---|
+| Database | Supabase project `nehfnsafysjqvubcqxzx` (ap-southeast-1) | schema + RLS + `commit_position_event` / `wallet_event_stats` applied; seeded with 6 real leaderboard wallets, default rules, 20 coin tiers |
+| Dashboard | Vercel project `smart-money-alerts` → https://smart-money-alerts-seven.vercel.app | live, auto-deploys from `main`, Vercel login-wall only on previews |
+| Worker | Render web service `sma-worker` (Singapore, Docker) → https://sma-worker.onrender.com/healthz | deployed in **DRY_RUN** with a placeholder service-role key (boots once the key is set) |
+| Code | https://github.com/deltabond37-tech/smart-money-alerts (public; contains no secrets) | pushes to `main` redeploy both |
+
+Remaining manual steps (things the APIs do not expose):
+1. **Supabase → Settings → API**: copy the `service_role` key and set it as `SUPABASE_SERVICE_ROLE_KEY` on the Render service (currently `SET_ME`, which fails validation on purpose).
+2. **Supabase → SQL Editor**: run the `prune_old_data` block from `supabase/migrations/20261013000003_functions.sql` (the MCP tool declines statements containing DELETE). Until then the worker logs one "retention prune failed" line per day; nothing else is affected.
+3. **Supabase → Auth → URL Configuration**: Site URL `https://smart-money-alerts-seven.vercel.app`; add `https://smart-money-alerts-seven.vercel.app/auth/confirm` and `http://localhost:3000/auth/confirm` to Redirect URLs. Sign-ins are allow-listed to `DASHBOARD_ALLOWED_EMAILS` on Vercel (edit there).
+4. **Slack**: create the app + channels (section 2 above), then on Render set `SLACK_BOT_TOKEN` and `DRY_RUN=false`; on Vercel set `SLACK_BOT_TOKEN` for test alerts.
+5. **Render billing**: the service runs on the free plan, which sleeps after 15 min without inbound traffic. Add a card and switch to `starter` (or recreate it as a Background Worker from `render.yaml`) for 24/7 polling.
+
 ## Environment variables
 
 | Variable | Where | Notes |
