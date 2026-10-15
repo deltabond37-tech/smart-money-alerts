@@ -37,8 +37,8 @@ Hyperliquid Info API ──poll/diff──▶ worker (Render) ──▶ Supabase
 
 ### 2. Slack app
 1. https://api.slack.com/apps → Create New App → From scratch.
-2. **OAuth & Permissions → Bot Token Scopes**: `chat:write`, `chat:write.public`. Install to workspace; copy the **Bot User OAuth Token** (`xoxb-…`).
-3. Create channels `#sm-high-conviction`, `#sm-feed`, `#sm-clusters`, `#sm-ops` (public; with `chat:write.public` the bot can post without being invited. For private channels, invite the bot and use the channel ID).
+2. **OAuth & Permissions → Bot Token Scopes**: `chat:write` only (least privilege; the bot can post solely in channels it is invited to). Install to workspace; copy the **Bot User OAuth Token** (`xoxb-…`).
+3. Create channels `#sm-high-conviction`, `#sm-feed`, `#sm-clusters`, `#sm-ops` and `/invite @Smart Money Alerts` in each. Public channels can be referenced by `#name`; **private channels must be referenced by channel ID** (channel details → About → Channel ID) in the `SLACK_CHANNEL_*` variables. Adding `chat:write.public` is optional and only removes the need to invite the bot to public channels.
 
 ### 3. Local run
 ```bash
