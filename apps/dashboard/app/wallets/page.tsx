@@ -1,3 +1,4 @@
+import { guarded } from "@/components/PageGuard";
 import { Badge, Button, Card, Notice } from "@/components/ui";
 import { getWallets, type Row } from "@/lib/data";
 import { ago, short } from "@/lib/format";
@@ -101,7 +102,7 @@ function WalletRow({ w }: { w: Row }) {
   );
 }
 
-export default async function WalletsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+async function WalletsPageInner({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const wallets = await getWallets();
   return (
@@ -178,4 +179,8 @@ export default async function WalletsPage({ searchParams }: { searchParams: Prom
       </div>
     </div>
   );
+}
+
+export default async function WalletsPage(props: Parameters<typeof WalletsPageInner>[0]) {
+  return guarded(() => WalletsPageInner(props));
 }

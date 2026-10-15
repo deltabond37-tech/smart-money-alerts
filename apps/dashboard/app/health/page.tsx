@@ -1,3 +1,4 @@
+import { guarded } from "@/components/PageGuard";
 import { Badge, Button, Card, Notice, Stat } from "@/components/ui";
 import { getHealth, type Row } from "@/lib/data";
 import { slackChannels } from "@/lib/env";
@@ -6,7 +7,7 @@ import { sendTestAlert } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function HealthPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+async function HealthPageInner({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const h = await getHealth();
   const channels = slackChannels();
@@ -116,4 +117,8 @@ export default async function HealthPage({ searchParams }: { searchParams: Promi
       </Card>
     </div>
   );
+}
+
+export default async function HealthPage(props: Parameters<typeof HealthPageInner>[0]) {
+  return guarded(() => HealthPageInner(props));
 }

@@ -1,3 +1,4 @@
+import { guarded } from "@/components/PageGuard";
 import { Badge, Button, Card, EVENT_TONE } from "@/components/ui";
 import { getEvents, getWallets, type Row } from "@/lib/data";
 import { fmtNum, fmtPct, fmtTs, fmtUsd } from "@/lib/format";
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const REASONS = ["muted", "mm_flagged", "event_type_disabled", "coin_blacklist", "coin_not_whitelisted", "dust", "min_delta_notional", "min_pct_change", "min_equity_pct", "leverage_out_of_range", "close_min_realized_pnl", "cooldown", "below_score_threshold"];
 
-export default async function EventsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+async function EventsPageInner({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const filters = {
     wallet: sp.wallet || undefined,
@@ -137,4 +138,8 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
       </Card>
     </div>
   );
+}
+
+export default async function EventsPage(props: Parameters<typeof EventsPageInner>[0]) {
+  return guarded(() => EventsPageInner(props));
 }

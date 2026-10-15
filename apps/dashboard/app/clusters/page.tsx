@@ -1,10 +1,11 @@
+import { guarded } from "@/components/PageGuard";
 import { Badge, Card } from "@/components/ui";
 import { getClusters, getWallets, type Row } from "@/lib/data";
 import { fmtTs } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default async function ClustersPage() {
+async function ClustersPageInner() {
   const [clusters, wallets] = await Promise.all([getClusters(), getWallets()]);
   const byId = new Map(wallets.map((w: Row) => [w.id, w]));
   return (
@@ -57,4 +58,8 @@ export default async function ClustersPage() {
       </table>
     </Card>
   );
+}
+
+export default async function ClustersPage() {
+  return guarded(() => ClustersPageInner());
 }

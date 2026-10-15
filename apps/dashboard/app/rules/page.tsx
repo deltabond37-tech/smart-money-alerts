@@ -1,3 +1,4 @@
+import { guarded } from "@/components/PageGuard";
 import { DEFAULT_THRESHOLDS, mergeThresholds } from "@sma/core";
 import { Button, Card, Notice } from "@/components/ui";
 import { getCoinTiers, getRules, type Row } from "@/lib/data";
@@ -7,7 +8,7 @@ import { saveCoinTiers } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function RulesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+async function RulesPageInner({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const [rules, coinTiers] = await Promise.all([getRules(), getCoinTiers()]);
   const channels = slackChannels();
@@ -91,4 +92,8 @@ export default async function RulesPage({ searchParams }: { searchParams: Promis
       </Card>
     </div>
   );
+}
+
+export default async function RulesPage(props: Parameters<typeof RulesPageInner>[0]) {
+  return guarded(() => RulesPageInner(props));
 }
