@@ -5,7 +5,19 @@ export function publicEnv() {
   return { url, key };
 }
 
-export const TIME_ZONE = process.env.TZ || "Asia/Kolkata";
+function validTimeZone(tz: string | undefined): string | null {
+  if (!tz) return null;
+  const clean = tz.replace(/^:/, ""); // Vercel sets TZ=":UTC" (POSIX form), which Intl rejects
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: clean });
+    return clean;
+  } catch {
+    return null;
+  }
+}
+
+/** Display time zone. Set DASHBOARD_TZ to override (TZ is reserved on Vercel). Defaults to IST. */
+export const TIME_ZONE = validTimeZone(process.env.DASHBOARD_TZ) ?? validTimeZone(process.env.TZ) ?? "Asia/Kolkata";
 
 export function slackChannels() {
   return {
