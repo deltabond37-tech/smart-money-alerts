@@ -1,0 +1,19 @@
+{
+  "name": "smart-money-alerts",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.0",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "pnpm -r --filter ./packages/* --filter ./apps/* run build",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "worker": "pnpm --filter @sma/worker start",
+    "worker:dev": "pnpm --filter @sma/worker dev",
+    "dashboard:dev": "pnpm --filter @sma/dashboard dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

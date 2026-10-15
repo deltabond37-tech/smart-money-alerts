@@ -1,0 +1,62 @@
+# Render Blueprint — Smart Money Alerts worker (Background Worker, Docker runtime).
+# Deploy: Render Dashboard → New → Blueprint → select this repo. Secrets marked sync: false are entered in the UI.
+services:
+  - type: worker
+    name: sma-worker
+    runtime: docker
+    region: singapore          # closest to IST; change to oregon/frankfurt if preferred
+    plan: starter
+    dockerfilePath: ./apps/worker/Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Kolkata
+      - key: WORKER_ID
+        value: render-worker-1
+      - key: LOG_LEVEL
+        value: info
+
+      # Supabase (service role — worker only)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+      # Slack
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_CHANNEL_HIGH
+        value: "#sm-high-conviction"
+      - key: SLACK_CHANNEL_FEED
+        value: "#sm-feed"
+      - key: SLACK_CHANNEL_CLUSTERS
+        value: "#sm-clusters"
+      - key: SLACK_CHANNEL_OPS
+        value: "#sm-ops"
+
+      # Hyperliquid + budget (IP limit is 1200 weight/min; keep headroom)
+      - key: HL_API_URL
+        value: https://api.hyperliquid.xyz
+      - key: HL_WS_URL
+        value: wss://api.hyperliquid.xyz/ws
+      - key: POLL_BUDGET_WEIGHT_PER_MIN
+        value: "800"
+      - key: POLL_MIN_INTERVAL_SEC
+        value: "5"
+      - key: ENABLE_PRIORITY_WS
+        value: "false"
+
+      # Behaviour
+      - key: AGG_WINDOW_SEC
+        value: "120"
+      - key: CONFIG_RELOAD_SEC
+        value: "60"
+      - key: FILLS_SYNC_INTERVAL_SEC
+        value: "900"
+      - key: RETENTION_DAYS
+        value: "30"
+      - key: DRY_RUN
+        value: "false"
