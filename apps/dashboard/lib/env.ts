@@ -16,7 +16,10 @@ export function slackChannels() {
   };
 }
 
-/** Optional allowlist. When set, only these emails may sign in (checked at login and in middleware). */
+/**
+ * Optional allowlist. When set, only matching emails may sign in (checked at login and in middleware).
+ * Entries are exact emails (`alice@x.com`) or whole domains (`@x.com`).
+ */
 export function allowedEmails(): string[] | null {
   const raw = process.env.DASHBOARD_ALLOWED_EMAILS?.trim();
   if (!raw) return null;
@@ -29,5 +32,8 @@ export function allowedEmails(): string[] | null {
 export function isEmailAllowed(email: string | undefined | null): boolean {
   const list = allowedEmails();
   if (!list) return true;
-  return !!email && list.includes(email.toLowerCase());
+  if (!email) return false;
+  const e = email.toLowerCase();
+  const domain = e.slice(e.lastIndexOf("@"));
+  return list.some((entry) => (entry.startsWith("@") ? entry === domain : entry === e));
 }
