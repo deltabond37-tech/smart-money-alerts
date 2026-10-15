@@ -3,9 +3,9 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Magic-link landing. Supports both flows:
- *  - PKCE redirect with ?code=...  (default Supabase email template)
- *  - token_hash flow with ?token_hash=...&type=magiclink (custom template)
+ * Server-side auth landing for the PKCE (?code=) and token-hash (?token_hash=&type=) flows.
+ * The default magic-link flow used by /login lands on /auth/confirm (client page) instead, because
+ * those links are commonly opened on a different device than the one that requested them.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);

@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isEmailAllowed, publicEnv } from "../env";
 
-const PUBLIC_PATHS = ["/login", "/auth/confirm", "/auth/signout"];
+const PUBLIC_PATHS = ["/login", "/auth/confirm", "/auth/callback", "/auth/signout"];
 
 /** Refreshes the session cookie and redirects unauthenticated (or non-allowlisted) users to /login. */
 export async function updateSession(request: NextRequest) {
