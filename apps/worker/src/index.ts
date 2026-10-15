@@ -3,6 +3,7 @@ import { HlInfoClient } from "./adapters/hyperliquid/client.js";
 import { HyperliquidAdapter } from "./adapters/hyperliquid/HyperliquidAdapter.js";
 import { channelsFromEnv, loadEnv } from "./config.js";
 import { createSupabase, SupabaseRepo } from "./db/supabaseRepo.js";
+import { startHealthServer } from "./health.js";
 import { createLogger, errMsg } from "./logger.js";
 import { Alerter } from "./services/alerter.js";
 import { ConfigLoader } from "./services/configLoader.js";
@@ -62,6 +63,10 @@ async function main(): Promise<void> {
   config.start(sb);
   periodic.start();
 
+  // Optional HTTP health endpoint (lets the worker run as a Render web service; unset for a true Background Worker).
+  const healthPort = Number(process.env.PORT ?? process.env.HEALTH_PORT ?? 0);
+  const health = healthPort > 0 ? startHealthServer(healthPort, poller, { version: VERSION, dryRun: env.DRY_RUN }, log) : null;
+
   let stopWs: (() => void) | null = null;
   const startWs = () => {
     stopWs?.();
@@ -90,6 +95,7 @@ async function main(): Promise<void> {
     config.stop();
     clearInterval(wsRefresh);
     stopWs?.();
+    health?.close();
     await periodic.heartbeat().catch(() => undefined);
     setTimeout(() => process.exit(0), 500);
   };
